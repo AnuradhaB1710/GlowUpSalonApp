@@ -1,0 +1,24 @@
+name: salon_app
+description: Salon booking app built with Flutter using Clean Architecture.
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.6
+  intl: ^0.19.0
+  provider: ^6.1.2      # simple state management for the presentation layer
+  get_it: ^7.7.0         # service locator for dependency injection
+  uuid: ^4.4.0           # generate booking ids
+  shared_preferences: ^2.3.2  # persist bookings on-device until the user deletes them
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+
+flutter:
+  uses-material-design: true
