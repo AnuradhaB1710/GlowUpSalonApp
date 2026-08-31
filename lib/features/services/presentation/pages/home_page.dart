@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../booking/presentation/pages/booking_page.dart';
 import '../../../booking/presentation/pages/bookings_list_page.dart';
+import '../../domain/entities/service_entity.dart';
 import '../providers/service_provider.dart';
+// import '../widgets/banner_carousel.dart';
+import '../widgets/banner_item.dart';
 import '../widgets/service_card.dart';
 
 class HomePage extends StatefulWidget {
@@ -50,6 +53,10 @@ class _HomePageState extends State<HomePage> {
           return Column(
             children: [
               Padding(
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
+                child: BannerCarousel(items: _buildBannerItems(context, provider)),
+              ),
+              Padding(
                 padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
                 child: TextField(
                   decoration: InputDecoration(
@@ -77,7 +84,6 @@ class _HomePageState extends State<HomePage> {
                     final selected = cat == provider.category;
                     return ChoiceChip(
                       label: Text(cat),
-
                       selected: selected,
                       showCheckmark: false,
                       onSelected: (_) => provider.setCategory(cat),
@@ -118,5 +124,50 @@ class _HomePageState extends State<HomePage> {
         },
       ),
     );
+  }
+
+  /// Finds a service by (partial, case-insensitive) name match against the
+  /// full catalog. Falls back to the first available service if no match is
+  /// found, so a banner never dead-ends even if the catalog changes.
+  ServiceEntity? _findService(ServiceProvider provider, String nameContains) {
+    final all = provider.allServices;
+    if (all.isEmpty) return null;
+    return all.firstWhere(
+          (s) => s.name.toLowerCase().contains(nameContains.toLowerCase()),
+      orElse: () => all.first,
+    );
+  }
+
+  void _goToBooking(BuildContext context, ServiceProvider provider, ServiceEntity? service) {
+    if (service == null) return;
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => BookingPage(service: service, stylists: provider.stylists),
+      ),
+    );
+  }
+
+  List<BannerItem> _buildBannerItems(BuildContext context, ServiceProvider provider) {
+    return [
+      BannerItem(
+        title: '20% off your first booking',
+        subtitle: 'Use code GLOW20 at checkout',
+        icon: Icons.local_offer_outlined,
+        onCtaTap: () => _goToBooking(context, provider, _findService(provider, 'haircut')),
+      ),
+      BannerItem(
+        title: 'Free hair spa this week',
+        subtitle: 'With any coloring service',
+        icon: Icons.spa_outlined,
+        onCtaTap: () => _goToBooking(context, provider, _findService(provider, 'coloring')),
+      ),
+      BannerItem(
+        title: 'Glow-up combo',
+        subtitle: 'Facial + brows, save \$10',
+        icon: Icons.auto_awesome,
+        onCtaTap: () => _goToBooking(context, provider, _findService(provider, 'facial')),
+      ),
+    ];
   }
 }

@@ -1,100 +1,102 @@
-# Bloom Salon — Flutter, Clean Architecture
+# 💇‍♀️ GlowUp Salon App
 
-Same salon booking app as before, restructured into **Clean Architecture**:
-domain → data → presentation, per feature, with dependency injection.
+A modern salon booking app built with **Flutter**, following **Clean Architecture** principles for a scalable, testable, and maintainable codebase.
 
-## Why this structure
+<!-- Optional: add screenshots once you have them
+<p align="center">
+  <img src="screenshots/home.png" width="200" />
+  <img src="screenshots/booking.png" width="200" />
+  <img src="screenshots/bookings.png" width="200" />
+</p>
+-->
 
-- **Domain** (`domain/`) is pure Dart — entities, repository *interfaces*, and
-  use cases. No Flutter import, no knowledge of where data comes from or how
-  it's displayed. This is the layer business rules live in and the one that
-  changes least often.
-- **Data** (`data/`) implements the domain's repository interfaces. It owns
-  models (with `fromJson`/`toJson`), and data sources (currently in-memory —
-  swap for `sqflite`, `shared_preferences`, or a REST client without touching
-  domain or presentation).
-- **Presentation** (`presentation/`) is Flutter-only — `ChangeNotifier`
-  providers, pages, widgets. Pages talk to providers; providers talk to use
-  cases; nothing above the data layer touches a data source directly.
+## ✨ Features
 
-The dependency rule: **inner layers never import outer layers.** Domain
-knows nothing about data or presentation. Data knows about domain (it
-implements domain contracts) but not presentation. Presentation depends on
-domain (via use cases), not on data directly.
+- 🔍 **Browse services** — search and filter by category (Hair, Nails, Skin, Spa)
+- 📅 **Book appointments** — pick a stylist, date, and time in a few taps
+- 🗂️ **Manage bookings** — view all upcoming appointments, cancel anytime
+- 💾 **Persistent storage** — bookings are saved on-device and survive app restarts
+- 🎨 **Clean, warm UI** — Material 3 design with a custom terracotta theme
 
-## Folder structure
+## 🏗️ Architecture
+
+This project follows **Clean Architecture**, organized by feature, with a strict one-way dependency rule: `presentation → domain ← data`.
 
 ```
 lib/
-├── main.dart                        # wires DI + providers, launches HomePage
+├── main.dart                    # App entry point & dependency wiring
 ├── core/
-│   ├── di/service_locator.dart      # get_it wiring: datasource→repo→usecase→provider
-│   ├── theme/app_theme.dart         # colors & ThemeData
-│   └── utils/icon_mapper.dart       # maps domain's iconKey string -> IconData
+│   ├── di/                      # Dependency injection (get_it)
+│   ├── theme/                   # App-wide colors & ThemeData
+│   └── utils/                   # Shared helpers
 └── features/
     ├── services/
-    │   ├── domain/
-    │   │   ├── entities/            # ServiceEntity, StylistEntity
-    │   │   ├── repositories/        # ServiceRepository (abstract)
-    │   │   └── usecases/            # GetServices, GetStylists
-    │   ├── data/
-    │   │   ├── models/              # ServiceModel, StylistModel (+ JSON)
-    │   │   ├── datasources/         # ServiceLocalDataSource (in-memory)
-    │   │   └── repositories/        # ServiceRepositoryImpl
-    │   └── presentation/
-    │       ├── providers/           # ServiceProvider (ChangeNotifier)
-    │       ├── pages/               # HomePage
-    │       └── widgets/             # ServiceCard
+    │   ├── domain/               # Entities, repository interfaces, use cases
+    │   ├── data/                 # Models, data sources, repository impl
+    │   └── presentation/         # Providers, pages, widgets
     └── booking/
         ├── domain/
-        │   ├── entities/            # BookingEntity
-        │   ├── repositories/        # BookingRepository (abstract)
-        │   └── usecases/            # CreateBooking, GetBookings, CancelBooking
         ├── data/
-        │   ├── models/              # BookingModel (+ JSON)
-        │   ├── datasources/         # BookingLocalDataSource (in-memory)
-        │   └── repositories/        # BookingRepositoryImpl
         └── presentation/
-            ├── providers/           # BookingProvider
-            └── pages/               # BookingPage, BookingsListPage
 ```
 
-## State management & DI
+| Layer | Responsibility | Depends on |
+|---|---|---|
+| **Domain** | Business entities & rules — pure Dart, no Flutter imports | Nothing |
+| **Data** | Models, local/remote data sources, repository implementations | Domain |
+| **Presentation** | UI, state management (Providers), navigation | Domain (via use cases) |
 
-- **provider** (`ChangeNotifier`) — simple, official-recommendation-adjacent
-  state management. Each feature has one provider.
-- **get_it** — service locator used only in `core/di/service_locator.dart` to
-  wire data sources → repositories → use cases → providers. `main.dart`
-  never constructs a repository or data source itself.
+This separation means storage (e.g. swapping `shared_preferences` for `sqflite` or a REST API) can change without touching business logic or UI.
 
-## Business rule example
+## 🛠️ Tech Stack
 
-`CreateBooking` (domain use case) rejects a booking whose date/time is in
-the past, and throws a typed `CreateBookingFailure`. The `BookingProvider`
-catches it and exposes `submitError` for the UI — the UI never has to know
-the rule exists, just how to react to a failure.
+- **[Flutter](https://flutter.dev)** — UI toolkit
+- **[Provider](https://pub.dev/packages/provider)** — state management
+- **[get_it](https://pub.dev/packages/get_it)** — dependency injection / service locator
+- **[shared_preferences](https://pub.dev/packages/shared_preferences)** — local persistence for bookings
+- **[intl](https://pub.dev/packages/intl)** — date/time formatting
+- **[uuid](https://pub.dev/packages/uuid)** — unique booking IDs
 
-## Swapping the data source later
+## 🚀 Getting Started
 
-To move from in-memory to real persistence:
-1. Add `sqflite` (or `shared_preferences`, or `dio` for a REST API) to
-   `pubspec.yaml`.
-2. Create a new class implementing `ServiceLocalDataSource` /
-   `BookingLocalDataSource` (or add a `*RemoteDataSource` and combine both
-   behind the same repository).
-3. Update the two lines in `service_locator.dart` that register the data
-   source implementations.
+### Prerequisites
+- [Flutter SDK](https://docs.flutter.dev/get-started/install) installed
+- Android Studio / Xcode set up for your target platform
 
-No changes needed in domain, providers, or pages.
+### Setup
 
-## Run it
+```bash
+# 1. Clone the repo
+git clone https://github.com/AnuradhaB1710/GlowUpSalonApp.git
+cd GlowUpSalonApp
 
-1. Generate platform folders (not included by default):
-   ```bash
-   flutter create --platforms=android,ios .
-   ```
-2. Install packages and run:
-   ```bash
-   flutter pub get
-   flutter run
-   ```
+# 2. Generate platform folders (android/ios), if not already present
+flutter create --platforms=android,ios .
+
+# 3. Install dependencies
+flutter pub get
+
+# 4. Run the app
+flutter run
+```
+
+## 📂 Project Structure Notes
+
+- **Services & stylists** are static demo data (`ServiceLocalDataSourceImpl`) — swap for an API when ready.
+- **Bookings** persist via `shared_preferences`, serialized as JSON, until the user explicitly deletes one.
+- To move to a database or backend later, only the `data/` layer for that feature needs to change — see inline comments in each `*_local_datasource.dart` file.
+
+## 🗺️ Roadmap Ideas
+
+- [ ] Push notification reminders before appointments
+- [ ] Stylist availability calendar
+- [ ] Online payment integration
+- [ ] User accounts & booking history sync across devices
+
+## 🤝 Contributing
+
+Pull requests are welcome! For major changes, please open an issue first to discuss what you'd like to change.
+
+## 📄 License
+
+This project is open source. Add a license (e.g. MIT) here if you plan to share it publicly.

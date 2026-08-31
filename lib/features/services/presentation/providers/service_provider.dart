@@ -25,19 +25,24 @@ class ServiceProvider extends ChangeNotifier {
   List<ServiceEntity> _allServices = [];
   List<StylistEntity> stylists = [];
 
+  /// Full, unfiltered service catalog — useful when something (like a promo
+  /// banner) needs to find a specific service regardless of the current
+  /// search/category filter state.
+  List<ServiceEntity> get allServices => List.unmodifiable(_allServices);
+
   String query = '';
   String category = 'All';
 
   List<String> get categories => [
-        'All',
-        ...{for (final s in _allServices) s.category},
-      ];
+    'All',
+    ...{for (final s in _allServices) s.category},
+  ];
 
   List<ServiceEntity> get filteredServices => _allServices.where((s) {
-        final matchesCategory = category == 'All' || s.category == category;
-        final matchesQuery = s.name.toLowerCase().contains(query.toLowerCase());
-        return matchesCategory && matchesQuery;
-      }).toList();
+    final matchesCategory = category == 'All' || s.category == category;
+    final matchesQuery = s.name.toLowerCase().contains(query.toLowerCase());
+    return matchesCategory && matchesQuery;
+  }).toList();
 
   Future<void> load() async {
     status = LoadStatus.loading;
