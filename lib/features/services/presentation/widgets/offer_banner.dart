@@ -154,9 +154,10 @@ class _OfferBannerState extends State<OfferBanner> {
                 final item = widget.items[index];
 
                 return Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 8,
+                  padding: const EdgeInsets.only(
+                    left: 16,
+                    right: 16,
+                    bottom: 4,
                   ),
                   child: Container(
                     padding: const EdgeInsets.only(

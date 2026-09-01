@@ -15,6 +15,13 @@ import '../../features/services/domain/usecases/get_services.dart';
 import '../../features/services/domain/usecases/get_stylists.dart';
 import '../../features/services/presentation/providers/service_provider.dart';
 
+
+import '../../features/salon_info/data/datasources/salon_info_local_data_source.dart';
+import '../../features/salon_info/data/repositories/salon_info_repository_impl.dart';
+import '../../features/salon_info/domain/repositories/salon_info_repository.dart';
+import '../../features/salon_info/domain/usecases/get_salon_info.dart';
+import '../../features/salon_info/presentation/providers/salon_info_provider.dart';
+
 final sl = GetIt.instance;
 
 /// Registers every dependency, from the outside in:
@@ -35,4 +42,10 @@ void setupServiceLocator() {
   sl.registerLazySingleton(() => CreateBooking(sl()));
   sl.registerLazySingleton(() => CancelBooking(sl()));
   sl.registerFactory(() => BookingProvider(getBookings: sl(), createBooking: sl(), cancelBooking: sl()));
+
+  // ----- Salon Info feature -----
+  sl.registerLazySingleton<SalonInfoLocalDataSource>(() => SalonInfoLocalDataSourceImpl());
+  sl.registerLazySingleton<SalonInfoRepository>(() => SalonInfoRepositoryImpl(sl()));
+  sl.registerLazySingleton(() => GetSalonInfo(sl()));
+  sl.registerFactory(() => SalonInfoProvider(getSalonInfo: sl()));
 }

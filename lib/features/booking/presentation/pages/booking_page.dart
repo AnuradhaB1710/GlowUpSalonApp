@@ -198,8 +198,14 @@ class _BookingPageState extends State<BookingPage> {
               TextFormField(
                 controller: _phoneCtrl,
                 keyboardType: TextInputType.phone,
-                decoration: _inputDecoration('Phone number'),
-                validator: (v) => (v == null || v.trim().length < 6) ? 'Enter a valid phone number' : null,
+                maxLength: 13,
+                decoration: _inputDecoration('Phone number').copyWith(
+                  counterText: '',
+                ),
+                validator: (v) =>
+                (v == null || v.trim().length < 6)
+                    ? 'Enter a valid phone number'
+                    : null,
               ),
               const SizedBox(height: 28),
               SizedBox(

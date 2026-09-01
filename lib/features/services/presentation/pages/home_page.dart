@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../booking/presentation/pages/booking_page.dart';
 import '../../../booking/presentation/pages/bookings_list_page.dart';
+import '../../../salon_info/presentation/pages/salon_info_page.dart';
 import '../../domain/entities/service_entity.dart';
 import '../providers/service_provider.dart';
 // import '../widgets/banner_carousel.dart';
 import '../widgets/banner_item.dart';
 import '../widgets/service_card.dart';
+
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -29,8 +31,17 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Bloom Salon', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: const Text('GlowUp', style: TextStyle(fontWeight: FontWeight.bold)),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.info_outline),
+            tooltip: 'info',
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const SalonInfoPage()),
+            ),
+          ),
+          // const SizedBox(width: 8),
           IconButton(
             icon: const Icon(Icons.event_note_outlined),
             tooltip: 'My Bookings',
@@ -53,7 +64,7 @@ class _HomePageState extends State<HomePage> {
           return Column(
             children: [
               Padding(
-                padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
+                padding: const EdgeInsets.fromLTRB(0, 8, 16, 4),
                 child: BannerCarousel(items: _buildBannerItems(context, provider)),
               ),
               Padding(
@@ -151,7 +162,7 @@ class _HomePageState extends State<HomePage> {
   List<BannerItem> _buildBannerItems(BuildContext context, ServiceProvider provider) {
     return [
       BannerItem(
-        title: '20% off your first booking',
+        title: '40% off your first booking',
         subtitle: 'Use code GLOW20 at checkout',
         icon: Icons.local_offer_outlined,
         onCtaTap: () => _goToBooking(context, provider, _findService(provider, 'haircut')),
@@ -167,6 +178,13 @@ class _HomePageState extends State<HomePage> {
         subtitle: 'Facial + brows, save \$10',
         icon: Icons.auto_awesome,
         onCtaTap: () => _goToBooking(context, provider, _findService(provider, 'facial')),
+      ),
+
+      BannerItem(
+        title: '20% off your second booking',
+        subtitle: 'Use code GLOW20 at checkout',
+        icon: Icons.local_offer_outlined,
+        onCtaTap: () => _goToBooking(context, provider, _findService(provider, 'haircut')),
       ),
     ];
   }

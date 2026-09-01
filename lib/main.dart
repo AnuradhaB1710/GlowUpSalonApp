@@ -6,6 +6,7 @@ import 'core/theme/app_theme.dart';
 import 'features/booking/presentation/providers/booking_provider.dart';
 import 'features/services/presentation/pages/home_page.dart';
 import 'features/services/presentation/providers/service_provider.dart';
+import 'features/salon_info/presentation/providers/salon_info_provider.dart';
 
 void main() {
   setupServiceLocator();
@@ -24,10 +25,11 @@ class SalonApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider<ServiceProvider>(create: (_) => sl<ServiceProvider>()),
         ChangeNotifierProvider<BookingProvider>(create: (_) => sl<BookingProvider>()),
+        ChangeNotifierProvider<SalonInfoProvider>(create: (_) => sl<SalonInfoProvider>()),
       ],
 
       child: MaterialApp(
-        title: 'Bloom Salon',
+        title: 'GlowUp Salon',
         debugShowCheckedModeBanner: false,
         theme: AppTheme.light,
         home: const HomePage(),
